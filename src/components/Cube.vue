@@ -1,11 +1,11 @@
 <template>
-  <div class="cube" :style="style">
-    <div
-      v-for="item in surface"
-      :key='item'
-      class="surface"
-      :class="item"
-      ></div>
+  <div class="cube" :style="style" :class="{transition}">
+    <div class="surface front" :style="{background:data.curPos['front']}"></div>
+    <div class="surface right" :style="{background:data.curPos['right']}"></div>
+    <div class="surface back" :style="{background:data.curPos['back']}"></div>
+    <div class="surface left" :style="{background:data.curPos['left']}"></div>
+    <div class="surface top" :style="{background:data.curPos['top']}"></div>
+    <div class="surface bottom" :style="{background:data.curPos['bottom']}"></div>
   </div>
 </template>
 <script>
@@ -16,10 +16,14 @@ export default {
       type: Object,
       default(){
         return {
-          initPos: {x: 0,y:0,z:0},
-          curPos: {x: 0,y:0,z:0,rotateX:0,rotateY:0,rotateZ:0}
+          initPos: {},
+          curPos: {}
         }
       }
+    },
+    transition:{
+      type: Boolean,
+      default: false
     }
   },
   data(){
@@ -44,6 +48,8 @@ export default {
   width: 0;
   height: 0;
   transform-style: preserve-3d;
+}
+.cube.transition {
   transition: 800ms;
 }
 .surface {
@@ -52,7 +58,7 @@ export default {
   top: -40px;
   width: 80px;
   height: 80px;
-  background: #F00;
+  background: #000;
   border: 1px solid #000;
   border-radius: 10px;
   box-sizing: border-box;
