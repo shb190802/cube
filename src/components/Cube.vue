@@ -1,11 +1,11 @@
 <template>
   <div class="cube" :style="style" :class="{transition}">
-    <div class="surface front" :style="{background:data.curPos['front']}"></div>
-    <div class="surface right" :style="{background:data.curPos['right']}"></div>
-    <div class="surface back" :style="{background:data.curPos['back']}"></div>
-    <div class="surface left" :style="{background:data.curPos['left']}"></div>
-    <div class="surface top" :style="{background:data.curPos['top']}"></div>
-    <div class="surface bottom" :style="{background:data.curPos['bottom']}"></div>
+    <div class="surface front" :style="{background:data.cur['front']}"></div>
+    <div class="surface right" :style="{background:data.cur['right']}"></div>
+    <div class="surface back" :style="{background:data.cur['back']}"></div>
+    <div class="surface left" :style="{background:data.cur['left']}"></div>
+    <div class="surface top" :style="{background:data.cur['top']}"></div>
+    <div class="surface bottom" :style="{background:data.cur['bottom']}"></div>
   </div>
 </template>
 <script>
@@ -16,8 +16,8 @@ export default {
       type: Object,
       default(){
         return {
-          initPos: {},
-          curPos: {}
+          init: {},
+          cur: {}
         }
       }
     },
@@ -35,7 +35,7 @@ export default {
   computed:{
     style(){
       return `
-      transform: rotateX(${this.data.curPos.rotateX}deg) rotateY(${this.data.curPos.rotateY}deg) rotateZ(${this.data.curPos.rotateZ}deg) translate3d(${this.data.initPos.x * this.baseSize}px, ${this.data.initPos.y * this.baseSize}px,${this.data.initPos.z * this.baseSize}px)`
+      transform: rotateX(${this.data.cur.rotateX}deg) rotateY(${this.data.cur.rotateY}deg) rotateZ(${this.data.cur.rotateZ}deg) translate3d(${this.data.init.x * this.baseSize}px, ${this.data.init.y * this.baseSize}px,${this.data.init.z * this.baseSize}px)`
     }
   }
 }

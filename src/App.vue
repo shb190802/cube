@@ -38,123 +38,126 @@ export default {
   created() {
     this.init()
   },
-  watch: {
-    cubes: {
-      deep: true,
-      handler() {
-        console.log('change')
-      }
-    }
-  },
   methods: {
     init() {
       let cubes = []
-      let index = 0
+      let cubesObj = {}
       for (let x = -1; x < 2; x++) {
         for (let y = -1; y < 2; y++) {
           for (let z = -1; z < 2; z++) {
-            let pos = { x, y, z }
-            cubes.push({
-              index: index++,
-              initPos: {
+            let pos = {
+              x, y, z,
+              left: x == -1 ? 'blue' : 'black',
+              top: y == -1 ? 'yellow' : 'black',
+              front: z == 1 ? 'red' : 'black',
+              right: x == 1 ? 'green' : 'black',
+              back: z == -1 ? 'orange' : 'black',
+              bottom: y == 1 ? 'white' : 'black'
+            }
+            let data = {
+              init: {
                 ...pos,
-                left: x == -1 ? 'blue' : 'blue',
-                top: y == -1 ? 'yellow' : 'yellow',
-                front: z == 1 ? 'red' : 'red',
-                right: x == 1 ? 'green' : 'green',
-                back: z == -1 ? 'orange' : 'orange',
-                bottom: y == 1 ? 'white' : 'white'
               },
-              curPos: {
+              cur: {
                 ...pos,
                 rotateX: 0,
                 rotateY: 0,
-                rotateZ: 0,
-                left: x == -1 ? 'blue' : 'blue',
-                top: y == -1 ? 'yellow' : 'yellow',
-                front: z == 1 ? 'red' : 'red',
-                right: x == 1 ? 'green' : 'green',
-                back: z == -1 ? 'orange' : 'orange',
-                bottom: y == 1 ? 'white' : 'white'
+                rotateZ: 0
               }
-            })
+            }
+            cubes.push(data)
           }
         }
       }
       this.cubes = cubes
     },
     run(dir, index, deg) {
-
+      if (this.transition) return
       this.transition = true
       let list = this.cubes.forEach(cube => {
-        cube.initPos.top = cube.curPos.top
-        cube.initPos.right = cube.curPos.right
-        cube.initPos.bottom = cube.curPos.bottom
-        cube.initPos.left = cube.curPos.left
-        cube.initPos.front = cube.curPos.front
-        cube.initPos.back = cube.curPos.back
-        if (cube.curPos[dir] === index) {
+        cube.init.top = cube.cur.top
+        cube.init.right = cube.cur.right
+        cube.init.bottom = cube.cur.bottom
+        cube.init.left = cube.cur.left
+        cube.init.front = cube.cur.front
+        cube.init.back = cube.cur.back
+        if (cube.cur[dir] === index) {
           if (dir === 'y') {
-            cube.curPos.rotateY += deg
+            cube.cur.rotateY += deg
             if (deg === -90) {
-              let temp = cube.curPos.z
-              cube.curPos.z = cube.curPos.x
-              cube.curPos.x = -temp
+              let temp = cube.cur.z
+              cube.cur.z = cube.cur.x
+              cube.cur.x = -temp
             } else {
-              let temp = cube.curPos.x
-              cube.curPos.x = cube.curPos.z
-              cube.curPos.z = -temp
+              let temp = cube.cur.x
+              cube.cur.x = cube.cur.z
+              cube.cur.z = -temp
             }
           } else if (dir === 'x') {
-            cube.curPos.rotateX += deg
+            cube.cur.rotateX += deg
             if (deg === -90) {
-              let temp = cube.curPos.y
-              cube.curPos.y = cube.curPos.z
-              cube.curPos.z = -temp
+              let temp = cube.cur.y
+              cube.cur.y = cube.cur.z
+              cube.cur.z = -temp
             } else {
-              let temp = cube.curPos.z
-              cube.curPos.z = cube.curPos.y
-              cube.curPos.y = -temp
+              let temp = cube.cur.z
+              cube.cur.z = cube.cur.y
+              cube.cur.y = -temp
             }
           }
-          this.resetStyle(cube, dir, deg)
+          this.$nextTick(() => {
+            this.resetStyle(cube, dir, deg)
+          })
         }
       })
-
     },
     resetStyle(cube, dir, deg) {
+      let sourceCube = this.cubes.find(item => cube.init.x === item.cur.x && cube.init.y === item.cur.y && cube.init.z === item.cur.z)
+      let { top, right, bottom, left, front, back } = sourceCube.init
       setTimeout(() => {
-        let newCube = this.cubes.find(item => cube.curPos.x === item.initPos.x && cube.curPos.y === item.initPos.y && cube.curPos.z === item.initPos.z)
         this.transition = false
-        let { top, right, bottom, left, front, back } = newCube.initPos
-        if (dir === 'x' && deg === 90) {
-          cube.curPos.top = front
-          cube.curPos.bottom = back
-          cube.curPos.front = bottom
-          cube.curPos.back = top
-        } else if (dir === 'x' && deg === -90) {
-          cube.curPos.top = back
-          cube.curPos.bottom = front
-          cube.curPos.front = top
-          cube.curPos.back = bottom
-        } else if (dir === 'y' && deg === 90) {
-          cube.curPos.right = front
-          cube.curPos.left = back
-          cube.curPos.front = left
-          cube.curPos.back = right
-        } else if (dir === 'y' && deg === -90) {
-          cube.curPos.right = back
-          cube.curPos.left = front
-          cube.curPos.front = right
-          cube.curPos.back = left
+        if (dir === 'x') {
+          if (cube.cur.x === -1) {
+            cube.cur.left = left
+          } else if (cube.cur.x === 1) {
+            cube.cur.right = right
+          }
+          if (deg === 90) {
+            cube.cur.top = front
+            cube.cur.bottom = back
+            cube.cur.front = bottom
+            cube.cur.back = top
+          } else if (deg === -90) {
+            cube.cur.top = back
+            cube.cur.bottom = front
+            cube.cur.front = top
+            cube.cur.back = bottom
+          }
+        } else if (dir === 'y') {
+          if (cube.cur.y === -1) {
+            cube.cur.top = top
+          } else if (cube.cur.y === 1) {
+            cube.cur.bottom = bottom
+          }
+          if (deg === 90) {
+            cube.cur.right = front
+            cube.cur.left = back
+            cube.cur.front = left
+            cube.cur.back = right
+          } else if (deg === -90) {
+            cube.cur.right = back
+            cube.cur.left = front
+            cube.cur.front = right
+            cube.cur.back = left
+          }
         }
         this.$nextTick(() => {
-          cube.curPos.x = cube.initPos.x
-          cube.curPos.y = cube.initPos.y
-          cube.curPos.z = cube.initPos.z
-          cube.curPos.rotateX = 0
-          cube.curPos.rotateY = 0
-          cube.curPos.rotateZ = 0
+          cube.cur.x = cube.init.x
+          cube.cur.y = cube.init.y
+          cube.cur.z = cube.init.z
+          cube.cur.rotateX = 0
+          cube.cur.rotateY = 0
+          cube.cur.rotateZ = 0
         })
       }, 800)
     },
